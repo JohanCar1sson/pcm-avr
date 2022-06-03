@@ -1,5 +1,5 @@
 /* ATtiny85 source code for Noa's sheep
- * checks 18650 charge, bleats (using PCM), blinks some LEDs, and shuts down until button pressed again
+ * bleats (using PCM), blinks some LEDs, and shuts down when the button is released
  *
  * Copyright 2022 Johan Carlsson
  *
@@ -12,6 +12,8 @@
 #include <util/delay.h>
 
 #include "bleat.h"
+
+#define BLINKONTIME 2.5e2 /* ms */
 
 /* declare nbyte as volatile, so that user writes to it are atomic when 'rupts are enabled */
 volatile unsigned int nbyte;
@@ -55,8 +57,6 @@ int main()
 	/* CLKPR = (1 << CLKPCE); */ /* set CLKPCE to 1 and the other bits to zero to enable prescaler change */
 	/* CLKPR = 0; */ /* set CLKPS0-3 to zero (disable the clock prescaler) and CLKPCE to zero to effect the change */
 	/* CK is the clock source for T0 */
-
-	/* _NOP(); */
 
 	/* change the T1 clock source from CK to PCK (it runs faster) */
 	/* the three statements below MUST BE done one by one and in that order, see section 12.3.9 in datasheet */
@@ -123,8 +123,23 @@ int main()
 	TIMSK |= (1 << OCIE0A);
 
 	/* non-timer initialization */
-	DDRB |= (1 << DDB1); /* make PB1 (a.k.a. OC1A) an output pin */
+	DDRB |= (1 << DDB1); /* make PB1 (a.k.a. OC1A) an output pin for PCM audio */
+	DDRB |= ((1 << DDB0) | (1 << DDB2) | (1 << DDB3) | (1 << DDB4)); /* use PB0, PB2, PB3 and PB4 to drive LEDs */
 
-	/* inits are done, nothing else do do in main, just idle while the timers and ISR do their work... */
-	while (1);
+	/* inits are done, start blinking the LEDs while the timers and ISR do their work... */
+	while (1)
+	{
+		PORTB |= (1 << PORTB0); /* turn on red LED */
+		_delay_ms(BLINKONTIME);
+		PORTB &= ~(1 << PORTB0); /* turn off red LED */
+		PORTB |= (1 << PORTB2); /* turn on yellow LED */
+		_delay_ms(BLINKONTIME);
+		PORTB &= ~(1 << PORTB2); /* turn off yellow LED */
+		PORTB |= (1 << PORTB3); /* turn on green LED */
+		_delay_ms(BLINKONTIME);
+		PORTB &= ~(1 << PORTB3); /* turn off green LED */
+		PORTB |= (1 << PORTB4); /* turn on blue LED */
+		_delay_ms(BLINKONTIME);
+		PORTB &= ~(1 << PORTB4); /* turn off blue LED */
+	}
 }
