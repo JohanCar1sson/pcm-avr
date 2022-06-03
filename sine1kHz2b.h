@@ -8,7 +8,7 @@
 #define KONK_(a, b) a ## b
 
 const unsigned char KONK(RAUDIO_PREFIX, raudio_bitdepth) = 2;
-const unsigned long KONK(RAUDIO_PREFIX, raudio_length) = 8;
+const unsigned int KONK(RAUDIO_PREFIX, raudio_length) = 2;
 
 const unsigned char KONK(RAUDIO_PREFIX, raudio_data)[] PROGMEM = {254, 86};
 /* {255, 85}; */ /* square wave (for debugging) */

@@ -1,4 +1,4 @@
-/* Test code for doing PCM on tn85 (ATtiny85)
+/* test code for doing PCM on tn85 (ATtiny85)
  *
  * Copyright 2022 Johan Carlsson
  *
@@ -12,36 +12,39 @@
 
 #include "sine1kHz4b.h"
 
-unsigned char sample;
+/* declare nbyte as volatile, so that user writes to it are atomic when 'rupts are enabled */
+volatile unsigned int nbyte;
+/* declare nsample as volatile too, just to be safe */
+volatile unsigned char nsample;
 
-/* Gets called at the sample rate of 8 kHz to load the next raudio sample */
-/* Sets duty cycle (OCR1A + 1) / (OCR1C + 1) for T1 comparator A */
+/* gets called at the sample rate of 8 kHz to load the next raudio sample */
+/* sets the duty cycle (OCR1A + 1) / (OCR1C + 1) for T1 comparator A */
 ISR(TIM0_COMPA_vect/*, ISR_NOBLOCK*/) /* Enable nested interrupts so that this ISR won't disrupt T1's PWM (the OCF1A interrupt) */
 {
-	unsigned char databyte;
+	static unsigned char databyte;
 
-	if (sample < raudio_length)
+	if (nbyte < raudio_length)
 	{
+		if (!nsample) databyte = pgm_read_byte(raudio_data + nbyte++);
+
 		switch (raudio_bitdepth)
 		{
 			case 1:
-				databyte = pgm_read_byte(raudio_data + (sample >> 3)) >> (sample % 8);
-				OCR1A = databyte & 1;
+				OCR1A = (databyte >> nsample) & 1;
+				nsample = ++nsample % 8;
 				break;
 			case 2:
-				databyte = pgm_read_byte(raudio_data + (sample >> 2)) >> 2 * (sample % 4);
-				OCR1A = databyte & 3;
+				OCR1A = (databyte >> (nsample << 1)) & 3;
+				nsample = ++nsample % 4;
 				break;
 			case 4:
-				databyte = pgm_read_byte(raudio_data + (sample >> 1)) >> 4 * (sample % 2);
-				OCR1A = databyte & 15;
+				OCR1A = (databyte >> (nsample << 2)) & 15;
+				nsample = ++nsample % 2;
 				break;
 			case 8:
-				databyte = pgm_read_byte(raudio_data + sample);
 				OCR1A = databyte;
 		}
-		/* while (1); */
-		sample = ++sample % raudio_length;
+		if (raudio_length == nbyte) nbyte = 0;
 	}
 }
 
@@ -109,6 +112,9 @@ int main()
 	/* set the compare register */
 	OCR0A = 124; /* 1,000,000 Hz / (124 + 1) = 8,000 Hz */
 
+	nbyte = 0; /* initialize 2-byte raudio byte counter (used in ISR) before turning on 'rupts */
+	nsample = 0; /* initialize single-byte raudio sample-within-byte counter (used in ISR) */
+
 	/* enable interrupts */
 	sei();
 
@@ -117,7 +123,6 @@ int main()
 
 	/* non-timer initialization */
 	DDRB |= (1 << DDB1); /* make PB1 (a.k.a. OC1A) an output pin */
-	sample = 0; /* initialize raudio sample counter (used in ISR) */
 
 	/* inits are done, nothing else do do in main, just idle while the timers and ISR do their work... */
 	while (1);
