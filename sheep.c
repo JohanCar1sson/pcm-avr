@@ -1,5 +1,5 @@
 /* ATtiny85 source code for Noa's sheep
- * bleats (using PCM), blinks some LEDs, and shuts down when the button is released
+ * bleats (using PCM), blinks some LEDs
  *
  * Copyright 2022 Johan Carlsson
  *
@@ -47,7 +47,7 @@ ISR(TIM0_COMPA_vect/*, ISR_NOBLOCK*/) /* Enable nested interrupts so that this I
 			case 8:
 				OCR1A = databyte;
 		}
-		if (raudio_length == nbyte) nbyte = 0;
+		/* if (raudio_length == nbyte) nbyte = 0; */
 	}
 }
 
