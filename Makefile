@@ -1,15 +1,15 @@
 .PHONY : all
-all : test.hex sheep.hex
+all : demo1.hex sheep.hex
 
-test.hex : test.elf
-	avr-objcopy -O ihex -R .eeprom test.elf test.hex
-# avr-objcopy -j .text -j .data -O ihex test.elf test.hex
+demo1.hex : demo1.elf
+	avr-objcopy -O ihex -R .eeprom demo1.elf demo1.hex
+# avr-objcopy -j .text -j .data -O ihex demo1.elf demo1.hex
 
-test.elf : test.o
-	avr-gcc -mmcu=attiny85 test.o -o test.elf
+demo1.elf : demo1.o
+	avr-gcc -mmcu=attiny85 demo1.o -o demo1.elf
 
-test.o : test.c
-	avr-gcc -c test.c -mmcu=attiny85 -Os -o test.o
+demo1.o : demo1.c
+	avr-gcc -c demo1.c -mmcu=attiny85 -Os -o demo1.o
 
 sheep.hex : sheep.elf
 	avr-objcopy -O ihex -R .eeprom sheep.elf sheep.hex
@@ -21,14 +21,14 @@ sheep.o : sheep.c
 	avr-gcc -c sheep.c -mmcu=attiny85 -Os -o sheep.o
 
 .PHONY : flash
-flash : test.hex
-	avrdude -v -B 10 -p attiny85 -c stk500v1 -P /dev/ttyUSB0 -b 19200 -U flash:w:test.hex:i
-#avrdude -v -B 10 -p attiny85 -c usbasp -P usb -U flash:w:test.hex:i
+flash : demo1.hex
+	avrdude -v -B 10 -p attiny85 -c stk500v1 -P /dev/ttyUSB0 -b 19200 -U flash:w:demo1.hex:i
+#avrdude -v -B 10 -p attiny85 -c usbasp -P usb -U flash:w:demo1.hex:i
 
 .PHONY : sizecheck
 sizecheck :
-	avr-size -A test.elf
+	avr-size -A demo1.elf
 
 .PHONY : clean
 clean :
-	rm -f test.hex test.elf test.o sheep.hex sheep.elf sheep.o
+	rm -f demo1.hex demo1.elf demo1.o sheep.hex sheep.elf sheep.o
