@@ -202,8 +202,8 @@ void pcm_exit()
 	/* stop the modulation timer */
 	TCCR0B &= ~(1 << CS00);
 
-	/* drive PB1 low */
-	PORTB &= ~(1 << PB1);
+	/* disable output on PB1 (a.k.a. OC1A) */
+	DDRB &= ~(1 << DDB1);
 
 	return;
 }
