@@ -191,6 +191,11 @@ void pcm_exit()
 	/* disable PWM output signal on PB1 */
 	TCCR1 &= ~(1 << COM1A1);
 
+	/* switch from PLL to CK as the T1 clock source */
+	PLLCSR &= ~(1 << PCKE);
+	/* stop the PLL */
+	PLLCSR &= ~(1 << PLLE);
+
 	/* stop the PWM carrier timer */
 	TCCR1 &= ~(1 << CS10);
 
