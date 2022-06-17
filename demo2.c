@@ -1,8 +1,13 @@
 /* driver that demonstrates more advanced use of the pcm-tn85 library
  * (synchronous playback, and halting the timers to release them for other use)
  *
- * outputs: PCM on physical pin 6 (connect a loudspeaker)
- * and an LED (w/ ballast resistor of 1 kOhm or so) on physical pin 5
+ * outputs: PCM audio on physical pin 6 and a 0.24 Hz square wave on pin 5
+ * 1) connect positive leg of a large capacitor to pin 6 (I use 1 mF, 10 V) and
+ * then a loudspeaker (I use an 8 Ohm one) between the negative capacitor leg and ground
+ * 2) connect positive leg of an LED to pin 5 and then a resistor (1 kOhm is good)
+ * between negative LED leg and ground
+ * note: the raudio files for this demo use four bits per sample so the PWM frequency is
+ * 4 MHz and I doubt the speaker is affected by it so I don't use a low-pass filter
  *
  * Copyright 2022 Johan Carlsson
  *
