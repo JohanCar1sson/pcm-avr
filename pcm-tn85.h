@@ -55,6 +55,12 @@ ISR(TIM0_COMPA_vect/*, ISR_NOBLOCK*/) /* Enable nested interrupts so that this I
 
 void pcm_init()
 {
+	/* put unused peripherals to sleep to save power */
+	PRR |= (1 << PRUSI) | (1 << PRADC);
+
+	/* make sure timers 0 and 1 are awake */
+	PRR &= ~((1 << PRTIM0) | (1 << PRTIM1));
+
 	/* don't bump system clock CK from 1 MHz 8 MHz */
 	/* CLKPR = (1 << CLKPCE); */ /* set CLKPCE to 1 and the other bits to zero to enable prescaler change */
 	/* CLKPR = 0; */ /* set CLKPS0-3 to zero (disable the clock prescaler) and CLKPCE to zero to effect the change */
@@ -201,6 +207,9 @@ void pcm_exit()
 
 	/* stop the modulation timer */
 	TCCR0B &= ~(1 << CS00);
+
+	/* put timers 0 and 1 to sleep */
+	PRR |= (1 << PRTIM0) | (1 << PRTIM1);
 
 	/* disable output on PB1 (a.k.a. OC1A) */
 	DDRB &= ~(1 << DDB1);
