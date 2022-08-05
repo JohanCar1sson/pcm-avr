@@ -14,7 +14,7 @@
  */
 
 /* this header file has all the PCM functionality, no need to link in a library */
-#include "pcm-tn85.h"
+#include "pcm-avr.h"
 
 /* avoid name clashes when multiple raudio headers are included by prefixing */
 #define RAUDIO_PREFIX upchirp_
