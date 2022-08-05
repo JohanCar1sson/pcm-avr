@@ -8,7 +8,9 @@
 #include <avr/interrupt.h>
 #include <avr/io.h>
 #include <avr/pgmspace.h>
+#ifdef __AVR_ATtiny85__
 #define F_CPU 1000000
+#endif
 #include <util/delay.h>
 
 /* nloop == 1 loops the audio, nloop == 0 plays it only once */
@@ -55,6 +57,7 @@ ISR(TIM0_COMPA_vect/*, ISR_NOBLOCK*/) /* Enable nested interrupts so that this I
 
 void pcm_init()
 {
+#ifdef __AVR_ATtiny85__
 	/* put unused peripherals to sleep to save power */
 	PRR |= (1 << PRUSI) | (1 << PRADC);
 
@@ -105,6 +108,7 @@ void pcm_init()
 
 	/* set the compare register */
 	OCR0A = 124; /* 1,000,000 Hz / (124 + 1) = 8,000 Hz */
+#endif
 
 	nbyte = 0; /* initialize 2-byte raudio byte counter (used in ISR) before turning on 'rupts */
 	nsample = 0; /* initialize single-byte raudio sample-within-byte counter (used in ISR) */
@@ -112,11 +116,13 @@ void pcm_init()
 	/* enable interrupts */
 	sei();
 
+#ifdef __AVR_ATtiny85__
 	/* fire interrupt when TCNT0 == OCR0A */
 	TIMSK |= (1 << OCIE0A);
 
 	/* non-timer initialization */
 	DDRB |= (1 << DDB1); /* make PB1 (a.k.a. OC1A) an output pin */
+#endif
 
 	return;
 }
@@ -191,6 +197,7 @@ void pcm_play(const unsigned char *data, unsigned int length, unsigned char bits
 /* turn off timers and 'rupts, drive the output low */
 void pcm_exit()
 {
+#ifdef __AVR_ATtiny85__
 	/* disable playback per-sample interrupt */
 	TIMSK &= ~(1 << OCIE0A);
 
@@ -213,6 +220,7 @@ void pcm_exit()
 
 	/* disable output on PB1 (a.k.a. OC1A) */
 	DDRB &= ~(1 << DDB1);
+#endif
 
 	return;
 }
