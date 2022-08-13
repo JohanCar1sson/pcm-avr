@@ -8,6 +8,7 @@
 #include "pcm-avr.h"
 
 /* provide your raudio data here */
+/* #include "sqw1kHz4b.h" */ /* try this one on m328p */
 #include "sine1kHz4b.h"
 
 int main()

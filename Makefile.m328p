@@ -1,0 +1,24 @@
+.PHONY : all
+all : demo1.hex
+
+demo1.hex : demo1.elf
+	avr-objcopy -O ihex -R .eeprom demo1.elf demo1.hex
+# avr-objcopy -j .text -j .data -O ihex demo1.elf demo1.hex
+
+demo1.elf : demo1.o
+	avr-gcc -mmcu=atmega328p demo1.o -o demo1.elf
+
+demo1.o : demo1.c pcm-avr.h
+	avr-gcc -c demo1.c -mmcu=atmega328p -Os -o demo1.o
+
+.PHONY : flash
+flash : demo1.hex
+	avrdude -v -p atmega328p -c arduino -P /dev/ttyUSB0 -b 115200 -U flash:w:demo1.hex:i
+
+.PHONY : sizecheck
+sizecheck :
+	avr-size -A demo1.elf
+
+.PHONY : clean
+clean :
+	rm -f demo1.hex demo1.elf demo1.o
