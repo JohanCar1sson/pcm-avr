@@ -1,5 +1,7 @@
 /* driver that demonstrates the most basic use of the pcm-tn85 library
  *
+ * output: PCM audio on physical pin 6
+ *
  * Copyright 2022 Johan Carlsson
  *
  */
