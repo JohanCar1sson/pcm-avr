@@ -38,6 +38,7 @@ int main()
 
 	/* the chirping phase of your life is now over, use Timer 1 to slowly blink an LED instead */
 
+	PRR &= ~(1 << PRTIM1); /* wake up T1 */
 	TCCR1 |= (1 << CS10) | (1 << CS11) | (1 << CS12) | (1 << CS13); /* reduce T1 frequency 16,384x */
 	GTCCR |= (1 << PSR1); /* effect the new PS setting */
 	OCR1C = 255; /* set TOP value for the T1 counter */
