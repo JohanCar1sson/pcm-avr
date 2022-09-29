@@ -1,6 +1,6 @@
 /* driver that demonstrates the most basic use of the pcm-tn85 library
  *
- * output: PCM audio on physical pin 6
+ * output: PCM audio output on physical pin 6 (PB1) on tn85, and on physical pin 5 (PD5) on m328p
  *
  * Copyright 2022 Johan Carlsson
  *
